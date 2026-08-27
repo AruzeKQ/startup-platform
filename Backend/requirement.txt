@@ -1,0 +1,9 @@
+express
+nodemon
+mongoose
+Joi
+joi-password-complexity
+lodash
+bcrypt
+dotenv
+jsonwebtoken
