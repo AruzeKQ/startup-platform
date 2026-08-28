@@ -7,7 +7,8 @@ const projectSchema = new mongoose.Schema({
         type: String,
         trim: true,
         minlength: 5,
-        maxlength: 1024
+        maxlength: 1024,
+        required: true
     },
     description: {
         type: String,
@@ -32,8 +33,16 @@ const projectSchema = new mongoose.Schema({
 
 });
 
+function projectValidate(userInfo) {
+    const Schema = Joi.object({
+        projectName: Joi.string().min(5).max(1024).required(),
+        description: Joi.string().min(5).max(1024),
+    });
+}
+
 const Project = mongoose.model('Project', projectSchema);
 
 module.exports = {
-    Project
+    Project,
+    projectValidate
 };
