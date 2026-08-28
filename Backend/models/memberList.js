@@ -6,7 +6,7 @@ const memberListSchema = mongoose.Schema({
     project: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Project',
-        required: true
+        required: true,
     },
     user: {
         type: mongoose.Schema.Types.ObjectId,
@@ -22,9 +22,15 @@ const memberListSchema = mongoose.Schema({
         default: 'none'
     },
     joinedAt: {
-        type: Date
+        type: Date,
+        default: Date.now()
     }
 });
+
+memberListSchema.index(
+    { project: 1, user: 1 },
+    { unique: true }
+);
 
 const memberList = mongoose.model('memberList', memberListSchema);
 
