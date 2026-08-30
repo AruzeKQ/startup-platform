@@ -33,7 +33,7 @@ export default function ProjectCard({ project, onApply }) {
 
       <button
         onClick={() => onApply(project)}
-        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg transition-colors text-sm"
+        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg transition-colors text-sm cursor-pointer"
       >
         Ứng tuyển ngay
       </button>

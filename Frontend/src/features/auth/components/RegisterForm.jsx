@@ -88,7 +88,7 @@ export default function RegisterForm() {
 
       <button
         type="submit"
-        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg transition-colors text-sm shadow-sm mt-2"
+        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg transition-colors text-sm shadow-sm mt-2 cursor-pointer"
       >
         Tạo tài khoản
       </button>

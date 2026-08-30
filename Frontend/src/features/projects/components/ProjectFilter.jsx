@@ -17,7 +17,7 @@ export default function ProjectFilter() {
           <option value="hcm">TP. Hồ Chí Minh</option>
           <option value="remote">Remote</option>
         </select>
-        <button className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg text-sm transition-colors">
+        <button className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg text-sm transition-colors cursor-pointer">
           Tìm kiếm
         </button>
       </div>

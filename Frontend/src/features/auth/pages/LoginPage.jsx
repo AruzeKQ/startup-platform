@@ -16,6 +16,7 @@ export default function LoginPage() {
         
         {/* Render Form */}
         <LoginForm />
+        
       </div>
     </div>
   );
