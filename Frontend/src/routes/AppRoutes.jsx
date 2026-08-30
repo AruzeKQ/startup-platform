@@ -6,6 +6,10 @@ import MainLayout from '../layouts/MainLayout';
 // Import Pages
 import ProjectListPage from '../features/projects/pages/ProjectListPage';
 
+// Import Auth Pages
+import LoginPage from '../features/auth/pages/LoginPage';
+import RegisterPage from '../features/auth/pages/RegisterPage';
+
 export default function AppRoutes() {
   return (
     <Routes>
@@ -28,7 +32,9 @@ export default function AppRoutes() {
       />
 
       {/* Nhóm các route không dùng Layout chung (như Login, Register) */}
-      {/* <Route path="/login" element={<LoginPage />} /> */}
+      {/* Nhóm các route KHÔNG dùng Header/Footer (Trang độc lập) */}
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
       
       {/* Route bắt các đường dẫn không tồn tại (404) */}
       {/* <Route path="*" element={<NotFoundPage />} /> */}

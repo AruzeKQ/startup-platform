@@ -45,7 +45,7 @@ export default function Header() {
             </Link>
             {/* <Link to="/post-project" className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-4 py-2 rounded-lg text-sm transition-colors shadow-sm">
               Đăng dự án (Startup)
-            </Link> */} 
+            </Link> */}  
           </div>
         </div>
       </div>
