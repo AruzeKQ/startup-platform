@@ -7,3 +7,5 @@ router.get('/projects/:projectId/members', auth, memberListController.getAllMemb
 router.post('/projects/:projectId/members', auth, memberListController.addMember);
 router.delete('/projects/:projectId/members/:userId', auth, memberListController.deleteMember);
 router.put('/projects/:projectId/members/:userId', auth, memberListController.updateMemberRole);
+
+module.exports = router;

@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { authApi } from '../services/authApi';
 
 export default function LoginForm() {
   const [formData, setFormData] = useState({ email: '', password: '' });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: Xử lý gọi API Đăng nhập ở đây
-    console.log('Login data:', formData);
-    alert('Logic Đăng nhập do Khải tự handle nhé!');
+    const response = await authApi.login(formData);
+    alert("login thành công rồi nha phò!!!")
+
   };
 
   return (

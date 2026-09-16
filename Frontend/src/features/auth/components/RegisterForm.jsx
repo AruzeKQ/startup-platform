@@ -1,45 +1,52 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { authApi } from '../services/authApi';
 
 export default function RegisterForm() {
   // Có thêm role: 'candidate' (Ứng viên) hoặc 'startup' (Công ty)
   const [formData, setFormData] = useState({
-    role: 'candidate',
-    fullName: '',
+    // role: 'candidate',
+    name: '',
     email: '',
     password: '',
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: Xử lý gọi API Đăng ký
-    console.log('Register data:', formData);
-    alert(`Đăng ký tài khoản: ${formData.role === 'startup' ? 'Startup' : 'Ứng viên'}`);
+    const response = authApi.register(formData)
+    // alert(`Đăng ký tài khoản: ${formData.role === 'startup' ? 'Startup' : 'Ứng viên'}`);
+
+    //reset data form
+    setFormData({
+      // role: 'candidate',
+      name: '',
+      email: '',
+      password: '',
+    })
   };
+
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Chọn Role */}
       <div className="flex gap-4 mb-2">
-        <label className={`flex-1 cursor-pointer border rounded-lg p-3 text-center transition-all ${
-          formData.role === 'candidate' ? 'border-indigo-600 bg-indigo-50 text-indigo-700' : 'border-gray-200 text-gray-600 hover:bg-gray-50'
-        }`}>
-          <input 
-            type="radio" 
-            name="role" 
+        <label className={`flex-1 cursor-pointer border rounded-lg p-3 text-center transition-all ${formData.role === 'candidate' ? 'border-indigo-600 bg-indigo-50 text-indigo-700' : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+          }`}>
+          <input
+            type="radio"
+            name="role"
             className="hidden"
             checked={formData.role === 'candidate'}
             onChange={() => setFormData({ ...formData, role: 'candidate' })}
           />
           <span className="text-sm font-medium">🧑‍💻 Ứng viên</span>
         </label>
-        
-        <label className={`flex-1 cursor-pointer border rounded-lg p-3 text-center transition-all ${
-          formData.role === 'startup' ? 'border-indigo-600 bg-indigo-50 text-indigo-700' : 'border-gray-200 text-gray-600 hover:bg-gray-50'
-        }`}>
-          <input 
-            type="radio" 
-            name="role" 
+
+        <label className={`flex-1 cursor-pointer border rounded-lg p-3 text-center transition-all ${formData.role === 'startup' ? 'border-indigo-600 bg-indigo-50 text-indigo-700' : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+          }`}>
+          <input
+            type="radio"
+            name="role"
             className="hidden"
             checked={formData.role === 'startup'}
             onChange={() => setFormData({ ...formData, role: 'startup' })}
@@ -56,8 +63,8 @@ export default function RegisterForm() {
           type="text"
           required
           placeholder={formData.role === 'startup' ? 'VD: TechMatch JSC' : 'VD: Nguyễn Quang Khải'}
-          value={formData.fullName}
-          onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+          value={formData.name}
+          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-sm"
         />
       </div>

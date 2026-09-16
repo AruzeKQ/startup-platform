@@ -1,0 +1,96 @@
+==========================================================
+ErrorLog - Tổng hợp lỗi đã phát hiện và sửa
+Dự án startup-platform | FE: React/Vite | BE: Node/Express/Mongoose
+Ngày: 17/09/2026
+==========================================================
+
+[1] Backend chưa có API (mọi request đều 404)
+- Lỗi: BE chạy được nhưng không có endpoint nào.
+- Nguyên nhân: Backend/app.js chỉ connect MongoDB và app.listen, chưa app.use các router.
+- Cách sửa: Thêm app.use("/api/auth", authRouter); app.use("/api/users", userRouter);
+  app.use("/api/projects", projectRouter).
+
+[2] URL FE và BE lệch nhau -> 404 Not Found
+- Lỗi: POST http://localhost:3000/auth/register trả về 404.
+- Nguyên nhân: FE gọi /auth/register nhưng BE mount ở /api/auth nên đúng phải là /api/auth/register.
+- Cách sửa: Thống nhất: FE dùng BASE_URL http://localhost:3000/api, BE giữ prefix /api/... khi mount.
+
+[3] Dòng app.post("auth/") thừa trong app.js
+- Lỗi: Dòng app.post("auth/") không có callback, không phải route hợp lệ.
+- Nguyên nhân: Dòng được viết nhầm trong app.js.
+- Cách sửa: Xóa dòng đó đi.
+
+[4] userRegisterValidate / userUpdateValidate không return -> 500
+- Lỗi: POST register trả 500, log: TypeError: Cannot read properties of undefined (reading "error")
+  tại authController.js.
+- Nguyên nhân: Hai hàm trong models/user.js tạo Schema nhưng không return Schema.validate()
+  nên controller nhận undefined.
+- Cách sửa: Thêm return Schema.validate(userInfo) vào cuối 2 hàm.
+
+[5] result.status thay vì res.status trong authController.js
+- Lỗi: Khi validation fail, code gọi result.status(400) nhưng result là kết quả Joi, không có hàm .status.
+- Nguyên nhân: Viết nhầm biến result thay vì res.
+- Cách sửa: Đổi thành res.status(400).send(...).
+
+[6] Password dùng joi-password-complexity làm mongoose type (cảnh báo)
+- Lỗi: field password được gán pwdComplexity({...}) (một Joi schema) thay vì một mongoose type chuẩn.
+- Nguyên nhân: Sai kiểu dữ liệu (thực tế vẫn lưu được nhưng không chuẩn).
+- Cách sửa: Khuyến nghị: password: { type: String, required: true }.
+
+[7] models/project.js dùng Joi chưa import + không return
+- Lỗi: Sẽ crash khi dùng API project (Joi is not defined) và projectValidate không return.
+- Nguyên nhân: File chỉ require ({ required }) từ joi nhưng lại dùng Joi; hàm validate thiếu return.
+- Cách sửa: require("joi") đầy đủ và return Schema.validate(userInfo).
+
+[8] CORS: No Access-Control-Allow-Origin header
+- Lỗi: Trình duyệt chặn request từ origin http://localhost:5173.
+- Nguyên nhân: app.use(cors(...)) được đặt SAU các app.use(router) nên response từ router không đi qua
+  cors, không có header CORS. Request OPTIONS (preflight) cũng bị chặn.
+- Cách sửa: Đặt app.use(cors(...)) TRƯỚC khi mount routes.
+
+[9] req.body bị undefined (express.json sau routes)
+- Lỗi: Controller nhận req.body không có dữ liệu.
+- Nguyên nhân: app.use(express.json()) đặt sau các router nên body chưa được parse.
+- Cách sửa: Đặt app.use(express.json()) TRƯỚC các app.use(router) (cùng thứ tự với cors).
+
+[10] 400 "name" is required - form gửi fullName
+- Lỗi: Khi đăng ký, Joi báo "name" is required dù đã điền đầy đủ.
+- Nguyên nhân: RegisterForm gửi { role, fullName, email, password } nhưng BE/Joi cần
+  { name, email, password }.
+- Cách sửa: Đổi key fullName thành name trong state/form (hoặc map { name: formData.fullName }
+  khi submit).
+
+[11] Request gửi không có body (if(data){} rỗng) -> vẫn báo name is required
+- Lỗi: DevTools: fetch có "body": null; BE báo 400 name is required.
+- Nguyên nhân: Trong apiClients.js, khối if (data) {} rỗng, data không được stringify và không được
+  đưa vào fetch.
+- Cách sửa: if (data) { config.body = JSON.stringify(data); }
+
+[12] Gán config.data thay vì config.body
+- Lỗi: Sau khi fix ở trên, request vẫn có body: null.
+- Nguyên nhân: fetch() chỉ đọc thuộc tính body của config, bỏ qua thuộc tính data (data chỉ là
+  property tự thêm).
+- Cách sửa: Dùng config.body = JSON.stringify(data).
+
+[13] 400 "User already registered" (không phải lỗi code)
+- Lỗi: Đăng ký thất bại với message User already registered.
+- Nguyên nhân: Email trùng với user đã lưu trước đó (lần đăng ký trước đã thành công).
+- Cách sửa: Đổi email khác, hoặc xóa document cũ, hoặc kiểm tra DB để xác nhận data đã lưu.
+
+[14] Không thấy dữ liệu trong MongoDB Compass
+- Lỗi: Compass không hiện dữ liệu mới.
+- Nguyên nhân: DB_URL không ghi tên DB nên mongoose mặc định dùng DB "test" (hoặc đang xem nhầm
+  DB khác trong Compass).
+- Cách sửa: Sửa .env: DB_URL= mongodb://localhost:27017/startup-platform, restart BE, đăng ký lại
+  rồi refresh Compass.
+
+[15] SyntaxError Unexpected token khi đọc response
+- Lỗi: FE báo SyntaxError (ví dụ Unexpected token "<", "Unexpected token "U", "User alrea"...).
+- Nguyên nhân: BE trả lỗi bằng res.send("chuỗi text"), FE lại gọi response.json() vô điều kiện.
+- Cách sửa: Khuyến nghị: BE trả JSON { message: ... }; FE kiểm tra Content-Type trước khi json().
+
+==========================================================
+KẾT LUẬN
+==========================================================
+Khi gặp lỗi 400/500, hãy mở DevTools > Network xem Response để đọc đúng thông điệp từ BE,
+và nhớ restart BE sau khi sửa code (node app.js).

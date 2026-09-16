@@ -30,21 +30,10 @@ const userSchema = new mongoose.Schema({
         symbol: 1,
         requirementCount: 4
     }),
-    portfolioLink: {
-        type: String,
-        minlength: 6,
-        maxlength: 1024
-    },
-    role: {
-        type: String
-    },
-    rating: {
-        type: Number
-    },
-    skills: [{
-        type: String,
-        trim: true
-    }]
+
+    // role: {
+    //     type: String
+    // },
 
 });
 
@@ -61,9 +50,9 @@ function userRegisterValidate(userInfo) {
         name: Joi.string().min(5).max(1024).required(),
         email: Joi.string().min(5).max(255).required().email(),
         password: Joi.string().min(5).max(1024).required(),
-        portfolioLink: Joi.string().min(5).max(1024),
-        skills: Joi.string().min(5).max(1024),
+
     });
+    return Schema.validate(userInfo);
 }
 
 function userUpdateValidate(userInfo) {

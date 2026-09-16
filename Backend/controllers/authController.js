@@ -5,7 +5,7 @@ const { User, userRegisterValidate } = require('../models/user.js');
 const register = async (req, res) => {
     const result = userRegisterValidate(req.body);
     if (result.error) {
-        return result.status(400).send(result.error.details[0].message);
+        return res.status(400).send(result.error.details[0].message);
     }
     let user = await User.findOne({ email: req.body.email });
     if (user) {

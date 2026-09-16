@@ -8,3 +8,5 @@ router.post('/projects', auth, projectController.createProject);
 router.put('/projects/:id', auth, projectController.updateProject);
 router.delete('/projects/:id', auth, projectController.deleteProject);
 router.put('/projects/:id', auth, projectController.updateProjectStatus);
+
+module.exports = router;
