@@ -3,7 +3,7 @@ const { Project } = require('../models/project');
 const { memberList } = require('../models/memberList');
 
 const createTask = async (req, res) => {
-    const { taskId } = req.params;
+    ;
     const { project, title, description, status, priority, asignee, createdBy } = req.body;
     const existProject = await Project.findById(project);
     if (!existProject) {
@@ -34,27 +34,40 @@ const createTask = async (req, res) => {
     res.status(200).send('Task created successfully');
 };
 
-const getTaskById = (req, res) => {
-
+const getTaskById = async (req, res) => {
+    const { taskId } = req.params;
+    const task = await Task.findById(taskId)
+        .populate('project', 'projectName')
+        .populate('asignee', 'name email')
+        .populate('createdBy', 'name email');
+    if (!task) {
+        return res.status(404).send({ message: 'Task not found' });
+    }
+    res.status(200).send({ message: 'Task', task });
 };
 
 const updateTask = async (req, res) => {
+    const { taskId } = req.params
     const { project, title, description, status, priority, asignee, createdBy } = req.body;
-    const existProject = await Project.findById(project);
-    if (!existProject) {
-        return res.status(404).send('Project not found');
-    };
-    if (existProject.owner.toString() !== createdBy.user._id) {
-        return res.status(403).send('Access Denied');
-    };
+
     const existTask = await Task.findById(taskId);
     if (!existTask) {
         return res.status(404).send({ message: 'Task not found' });
     };
+
+    const existProject = await Project.findById(existTask.project);
+    if (!existProject) {
+        return res.status(404).send({ message: 'Project not found' });
+    }
+
+    if (existProject.owner.toString() !== req.user._id.toString()) {
+        return res.status(403).send('Access Denied');
+    };
+
     const checkInGroup = await memberList.findOne(
         {
             project: existProject._id,
-            user: asignee._id
+            user: asignee
         }
     );
     if (!checkInGroup) {
@@ -76,27 +89,28 @@ const updateTask = async (req, res) => {
         return res.status(404).send({ message: 'Invalid priority' });
     }
     //update
-    existTask.title = title ?? existTask.title;
-    existTask.description = description ?? existTask.description;
-    existTask.status = status ?? existTask.status;
-    existTask.priority = priority ?? existTask.priority;
-    existTask.asignee = asignee ?? existTask.asignee;
-
+    if (title !== undefined) existTask.title = title;
+    if (description !== undefined) existTask.description = description;
+    if (status !== undefined) existTask.status = status;
+    if (priority !== undefined) existTask.priority = priority;
+    if (asignee !== undefined) existTask.asignee = asignee;
     await existTask.save();
     res.status(200).send({ message: 'Task updated successfully', task: existTask });
 };
 
 const deleteTask = async (req, res) => {
-    const existProject = await Project.findById(project);
-    if (!existProject) {
-        return res.status(404).send('Project not found');
-    };
-    if (existProject.owner.toString() !== createdBy.user._id) {
-        return res.status(403).send('Access Denied');
-    };
+    const { taskId } = req.params
+
     const existTask = await Task.findById(taskId);
     if (!existTask) {
         return res.status(404).send({ message: 'Task not found' });
+    };
+    const existProject = await Project.findById(existTask.project);
+    if (!existProject) {
+        return res.status(404).send({ message: 'Project not found' });
+    }
+    if (existProject.owner.toString() !== req.user._id.toString()) {
+        return res.status(403).send('Access Denied');
     };
 
     const delTask = await Task.findOneAndDelete(taskId);
