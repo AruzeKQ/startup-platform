@@ -23,6 +23,7 @@ app.use('/api/users', userRouter);
 //projects router
 app.use('/api/projects', projectRouter);
 //tasks router
+app.use('/api/tasks', taskRouter);
 //app.use('/api/tasks', taskRouter);
 //chat router
 
