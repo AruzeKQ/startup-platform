@@ -8,10 +8,10 @@ export default function RegisterForm() {
   const navigate = useNavigate();
   // role: 'candidate' (Ứng viên) hoặc 'startup' (Công ty)
   const [formData, setFormData] = useState({
-    // role: 'candidate',
     name: '',
     email: '',
     password: '',
+    role: 'candidate',
   });
 
   const [status, setStatus] = useState(null);
@@ -24,6 +24,7 @@ export default function RegisterForm() {
         name: formData.name,
         email: formData.email,
         password: formData.password,
+        role: formData.role,
       });
 
       setStatus('success');
