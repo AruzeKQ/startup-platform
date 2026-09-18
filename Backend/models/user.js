@@ -30,10 +30,9 @@ const userSchema = new mongoose.Schema({
         symbol: 1,
         requirementCount: 4
     }),
-
-    // role: {
-    //     type: String
-    // },
+    role: {
+        type: String
+    },
 
 });
 
@@ -62,6 +61,7 @@ function userUpdateValidate(userInfo) {
         portfolioLink: Joi.string().min(5).max(1024),
         skills: Joi.string().min(5).max(1024),
     });
+    return Schema.validate(userInfo);
 }
 
 const User = mongoose.model('User', userSchema);

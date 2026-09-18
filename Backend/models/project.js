@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { required } = require('joi');
+const Joi = require('joi');
 const mongoose = require('mongoose');
 
 const projectSchema = new mongoose.Schema({
@@ -38,6 +38,7 @@ function projectValidate(userInfo) {
         projectName: Joi.string().min(5).max(1024).required(),
         description: Joi.string().min(5).max(1024),
     });
+    return Schema.validate(userInfo);
 }
 
 const Project = mongoose.model('Project', projectSchema);
