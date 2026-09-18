@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { authApi } from '../services/authApi';
 
 export default function RegisterForm() {
-  // Có thêm role: 'candidate' (Ứng viên) hoặc 'startup' (Công ty)
+  // khai báo thư viện nav
+  const navigate = useNavigate();
+  // role: 'candidate' (Ứng viên) hoặc 'startup' (Công ty)
   const [formData, setFormData] = useState({
     // role: 'candidate',
     name: '',
@@ -11,19 +14,35 @@ export default function RegisterForm() {
     password: '',
   });
 
+  const [status, setStatus] = useState(null);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const response = authApi.register(formData)
-    // alert(`Đăng ký tài khoản: ${formData.role === 'startup' ? 'Startup' : 'Ứng viên'}`);
+    setStatus(null);
+    try {
+      await authApi.register({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+      });
 
-    //reset data form
-    setFormData({
-      // role: 'candidate',
-      name: '',
-      email: '',
-      password: '',
-    })
-  };
+      setStatus('success');
+
+      // reset data form
+      setFormData({
+        name: '',
+        email: '',
+        password: '',
+        role: 'candidate',
+      })
+    } catch (err) {
+      setStatus('error');
+    };
+  }
+
+  const handleOK = () => {
+    navigate('/login')
+  }
 
 
   return (
@@ -106,6 +125,25 @@ export default function RegisterForm() {
           Đăng nhập
         </Link>
       </p>
+      {status === 'success' && (
+
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 max-w-sm w-full text-center">
+            <p className="text-gray-900 font-semibold mb-4">Tạo tài khoản thành công!</p>
+            <button
+              onClick={handleOK}
+              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded-lg"
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      )}
+      {status === 'error' && (
+        <div className="... bg-red-50 border border-red-300 text-red-700 rounded-lg p-3 text-sm">
+          Đăng ký thất bại, vui lòng thử lại.
+        </div>
+      )}
     </form>
   );
 }

@@ -4,12 +4,20 @@ import { authApi } from '../services/authApi';
 
 export default function LoginForm() {
   const [formData, setFormData] = useState({ email: '', password: '' });
+  const [checked, setChecked] = useState(null)
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const response = await authApi.login(formData);
-    alert("login thành công rồi nha phò!!!")
-
+    try {
+      const response = await authApi.login({
+        email: formData.email,
+        password: formData.password,
+      });
+      window.location.href = '/';
+    } catch (error) {
+      console.log('Đã xảy ra lỗi', error);
+      setChecked(true);
+    }
   };
 
   return (
@@ -19,7 +27,7 @@ export default function LoginForm() {
         <input
           type="email"
           required
-          placeholder="nhapemail@example.com"
+          placeholder="email@example.com"
           value={formData.email}
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
           className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none text-sm transition-all"
@@ -56,6 +64,11 @@ export default function LoginForm() {
           Đăng ký ngay
         </Link>
       </p>
+      {checked && (
+        <div className="... bg-red-50 border border-red-300 text-red-700 rounded-lg p-3 text-sm">
+          Đăng nhập thất bại, hãy kiểm tra lại tài khoản hoặc mật khẩu.
+        </div>
+      )}
     </form>
   );
 }
