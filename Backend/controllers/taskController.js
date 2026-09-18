@@ -77,7 +77,7 @@ const updateTask = async (req, res) => {
         'In progress',
         'Finished'
     ];
-    if (!validStatus.includes(status)) {
+    if (status !== undefined && !validStatus.includes(status)) {
         return res.status(404).send({ message: 'Invalid status' });
     }
     const validPriority = [
@@ -85,7 +85,7 @@ const updateTask = async (req, res) => {
         'Medium',
         'High'
     ];
-    if (!validPriority.includes(priority)) {
+    if (priority !== undefined && !validPriority.includes(priority)) {
         return res.status(404).send({ message: 'Invalid priority' });
     }
     //update
