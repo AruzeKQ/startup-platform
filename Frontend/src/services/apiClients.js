@@ -23,12 +23,14 @@ async function fetchClient(endpoint, { method = 'GET', data, ...customConfig } =
     try {
         // gọi api + đường dẫn
         const response = await fetch(`${BASE_URL}${endpoint}`, config);
+        const contentType = response.headers.get('content-type') || '';
 
-        // chuyển dữ liệu trả về sang JSON
-        const result = response.json();
+        // kiểm tra dạng trả về của BE (Json hay Text)
+        const result = contentType.includes('application/json') ? await response.json() : await response.text()
+
 
         if (!response.ok) {
-            throw new Error("Got Error!!!")
+            throw new Error(`HTTP ${response.status}: ${result}`)
         }
 
         return result;
