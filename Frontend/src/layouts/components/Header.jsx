@@ -6,29 +6,29 @@ export default function Header() {
     <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          
+
           {/* Link để trỏ về trang chủ */}
-          <Link to="/" className="flex-shrink-0 flex items-center cursor-pointer">
+          <Link to="/" className="shrink-0 flex items-center cursor-pointer">
             <span className="text-2xl font-bold text-indigo-600">StartupMatch</span>
           </Link>
 
           <nav className="hidden md:flex space-x-8">
             {/* Sử dụng NavLink để tự động bắt trạng thái "active" khi đang ở đúng trang đó */}
-            <NavLink 
-              to="/projects" 
-              className={({ isActive }) => 
-                isActive 
-                  ? "text-indigo-600 font-medium" 
+            <NavLink
+              to="/projects"
+              className={({ isActive }) =>
+                isActive
+                  ? "text-indigo-600 font-medium"
                   : "text-gray-900 font-medium hover:text-indigo-600 transition-colors"
               }
             >
               Tìm Dự Án
             </NavLink>
-            <NavLink 
-              to="/startups" 
-              className={({ isActive }) => 
-                isActive 
-                  ? "text-indigo-600 font-medium" 
+            <NavLink
+              to="/startups"
+              className={({ isActive }) =>
+                isActive
+                  ? "text-indigo-600 font-medium"
                   : "text-gray-500 font-medium hover:text-indigo-600 transition-colors"
               }
             >
@@ -45,7 +45,7 @@ export default function Header() {
             </Link>
             {/* <Link to="/post-project" className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-4 py-2 rounded-lg text-sm transition-colors shadow-sm">
               Đăng dự án (Startup)
-            </Link> */}  
+            </Link> */}
           </div>
         </div>
       </div>
