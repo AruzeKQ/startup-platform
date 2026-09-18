@@ -11,14 +11,14 @@ const register = async (req, res) => {
     if (user) {
         return res.status(400).send('User already registered');
     }
+    if (req.body.role !== 'candidate' || req.body.role !== 'startup') {
+        return res.status(400).send('Role not valid');
+    }
     user = new User({
         name: req.body.name,
         email: req.body.email,
         password: req.body.password,
-        portfolioLink: req.body.portfolioLink,
-        role: 'user',
-        rating: 0,
-        skills: req.body.skills
+        role: req.body.role,
     });
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(user.password, salt);
@@ -31,11 +31,11 @@ const register = async (req, res) => {
 const login = async (req, res) => {
     let user = await User.findOne({ email: req.body.email });
     if (!user) {
-        return res.send('Invalid email');
+        return res.status(400).send('Invalid email');
     }
     const validPassword = await bcrypt.compare(req.body.password, user.password);
     if (!validPassword) {
-        return res.send('Invalid password');
+        return res.status(400).send('Invalid password');
     }
     //jwt
     const token = user.generateAuthToken();

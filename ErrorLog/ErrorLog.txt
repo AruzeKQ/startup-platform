@@ -20,24 +20,24 @@ Ngày: 17/09/2026
 - Nguyên nhân: Dòng được viết nhầm trong app.js.
 - Cách sửa: Xóa dòng đó đi.
 
-[4] userRegisterValidate / userUpdateValidate không return -> 500
+[4] ------done------ userRegisterValidate / userUpdateValidate không return -> 500
 - Lỗi: POST register trả 500, log: TypeError: Cannot read properties of undefined (reading "error")
   tại authController.js.
 - Nguyên nhân: Hai hàm trong models/user.js tạo Schema nhưng không return Schema.validate()
   nên controller nhận undefined.
-- Cách sửa: Thêm return Schema.validate(userInfo) vào cuối 2 hàm.
+- Cách sửa: Thêm return Schema.validate(userInfo) vào cuối 2 hàm. 
 
-[5] result.status thay vì res.status trong authController.js
+[5] ------done------ result.status thay vì res.status trong authController.js
 - Lỗi: Khi validation fail, code gọi result.status(400) nhưng result là kết quả Joi, không có hàm .status.
 - Nguyên nhân: Viết nhầm biến result thay vì res.
 - Cách sửa: Đổi thành res.status(400).send(...).
 
-[6] Password dùng joi-password-complexity làm mongoose type (cảnh báo)
+[6] ------done------ Password dùng joi-password-complexity làm mongoose type (cảnh báo)
 - Lỗi: field password được gán pwdComplexity({...}) (một Joi schema) thay vì một mongoose type chuẩn.
 - Nguyên nhân: Sai kiểu dữ liệu (thực tế vẫn lưu được nhưng không chuẩn).
 - Cách sửa: Khuyến nghị: password: { type: String, required: true }.
 
-[7] models/project.js dùng Joi chưa import + không return
+[7] ------done------ models/project.js dùng Joi chưa import + không return
 - Lỗi: Sẽ crash khi dùng API project (Joi is not defined) và projectValidate không return.
 - Nguyên nhân: File chỉ require ({ required }) từ joi nhưng lại dùng Joi; hàm validate thiếu return.
 - Cách sửa: require("joi") đầy đủ và return Schema.validate(userInfo).
@@ -48,7 +48,7 @@ Ngày: 17/09/2026
   cors, không có header CORS. Request OPTIONS (preflight) cũng bị chặn.
 - Cách sửa: Đặt app.use(cors(...)) TRƯỚC khi mount routes.
 
-[9] req.body bị undefined (express.json sau routes)
+[9] ------done------ req.body bị undefined (express.json sau routes)
 - Lỗi: Controller nhận req.body không có dữ liệu.
 - Nguyên nhân: app.use(express.json()) đặt sau các router nên body chưa được parse.
 - Cách sửa: Đặt app.use(express.json()) TRƯỚC các app.use(router) (cùng thứ tự với cors).
