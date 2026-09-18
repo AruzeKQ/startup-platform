@@ -134,3 +134,10 @@ const deleteTask = async (req, res) => {
     }
 
 };
+
+module.exports = {
+    createTask,
+    getTaskById,
+    updateTask,
+    deleteTask
+};
