@@ -8,11 +8,12 @@ const userRouter = require('./routes/userRoutes');
 const projectRouter = require('./routes/projectRoutes');
 const taskRouter = require('./routes/taskRoutes');
 const memberListRouter = require('./routes/memberListRoute');
+//const documentRouter = require('./routes/documentRoute');
 const app = express();
 
 app.use(cors({
-    origin: 'http://localhost:5173', // Chỉ định rõ chỉ cho phép Frontend của bạn gọi vào
-    credentials: true,             // Cho phép gửi kèm cookie/token nếu có
+    origin: 'http://localhost:5173',
+    credentials: true,
 }));
 
 app.use(express.json());
@@ -30,7 +31,7 @@ app.use('/api', memberListRouter);
 //chat router
 
 //documents router
-
+// app.use('/api', documentRouter);
 //reviews router
 
 //connect to mongodb local 

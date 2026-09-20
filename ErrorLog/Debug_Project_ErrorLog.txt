@@ -1,0 +1,163 @@
+================================================================================
+BÁO CÁO DEBUG: CÁC LỖI TRONG MODEL PROJECT VÀ PROJECT CONTROLLER
+Dự án: startup-platform | Backend: Node.js / Express / Mongoose / Joi
+Thời gian: 20/09/2026
+================================================================================
+
+[TỔNG QUAN]
+Người dùng vừa bổ sung các trường mới vào Model Project (companyName, logoUrl, location,
+salary, tags, postedAt) và cập nhật hàm createProject, updateProject trong projectController.
+Sau khi rà soát và phân tích mã nguồn, phát hiện 4 lỗi nghiêm trọng và 1 cảnh báo kiến trúc:
+
+--------------------------------------------------------------------------------
+[LỖI 1] JOI VALIDATION CHƯA ĐỒNG BỘ CÁC TRƯỜNG MỚI -> 400 BAD REQUEST & 500 SERVER ERROR
+--------------------------------------------------------------------------------
+- Vị trí: Backend/models/project.js (hàm projectValidate, dòng 81-87)
+- Hiện trạng code:
+    function projectValidate(userInfo) {
+        const Schema = Joi.object({
+            projectName: Joi.string().min(5).max(1024).required(),
+            description: Joi.string().min(5).max(1024),
+        });
+        return Schema.validate(userInfo);
+    }
+- Nguyên nhân & Hậu quả:
+  1. Joi mặc định từ chối các trường không được định nghĩa (unknown keys). Khi Client/Frontend
+     gửi req.body có chứa companyName, logoUrl, location, salary, tags, postedAt thì Joi sẽ
+     ngay lập tức trả lỗi:
+     ValidationError: "companyName" is not allowed, "logoUrl" is not allowed...
+     -> Cả 2 API createProject và updateProject đều sẽ trả về mã 400 Bad Request.
+     -> Người dùng KHÔNG THỂ tạo hoặc cập nhật project với các trường mới!
+  2. Trường companyName trong Mongoose Schema được đánh dấu `required: true`. Tuy nhiên trong
+     projectValidate lại không bắt buộc trường này. Nếu client gửi thiếu companyName, Joi vẫn
+     cho qua, nhưng khi gọi `project.save()`, Mongoose sẽ văng lỗi validation và rơi vào khối catch,
+     trả về mã 500 Internal Server Error thay vì 400 Bad Request rõ ràng cho client.
+  3. Ràng buộc `description: Joi.string().min(5)`: Trong Mongoose schema không bắt buộc độ dài
+     tối thiểu cho description, nhưng Joi lại bắt tối thiểu 5 ký tự. Nếu gửi chuỗi rỗng sẽ bị 400.
+- Cách khắc phục:
+  Cập nhật đầy đủ các trường mới vào Joi Schema:
+    function projectValidate(userInfo) {
+        const Schema = Joi.object({
+            projectName: Joi.string().min(5).max(1024).required(),
+            companyName: Joi.string().max(1024).required(),
+            logoUrl: Joi.string().max(1024).allow('', null),
+            location: Joi.string().max(1024).allow('', null),
+            salary: Joi.string().max(1024).allow('', null),
+            description: Joi.string().max(1024).allow('', null),
+            tags: Joi.string().allow('', null), // hoặc Joi.array().items(Joi.string())
+            postedAt: Joi.date().allow('', null)
+        });
+        return Schema.validate(userInfo);
+    }
+----Done
+
+--------------------------------------------------------------------------------
+[LỖI 2] XUNG ĐỘT DEFAULT VÀ ENUM CỦA TRƯỜNG `tags` -> 500 CRASH SERVER KHI LƯU
+--------------------------------------------------------------------------------
+- Vị trí: Backend/models/project.js (dòng 54-74)
+- Hiện trạng code:
+    tags: {
+        type: String,
+        enum: [
+            'Frontend', 'Backend', 'Fullstack', 'React', 'Node.js',
+            'Express.js', 'MongoDB', 'MySQL', 'Flutter', 'Java',
+            'Python', 'AI', 'Machine Learning', 'DevOps'
+        ],
+        default: 'none',
+    }
+- Nguyên nhân & Hậu quả:
+  1. Giá trị mặc định được khai báo là `default: 'none'`, nhưng trong danh sách `enum`
+     hoàn toàn KHÔNG có giá trị `'none'`.
+  2. Khi người dùng tạo project mà không gửi trường tags (hoặc tags: undefined), Mongoose
+     sẽ tự động gán giá trị mặc định là `'none'`.
+  3. Khi gọi `await project.save()`, Mongoose tiến hành validate schema và phát hiện
+     giá trị `'none'` không hợp lệ, bắn ra lỗi:
+     ValidatorError: `none` is not a valid enum value for path `tags`.
+     -> Request rơi vào block catch và trả về mã 500 Internal Server Error!
+  4. Vấn đề kiểu dữ liệu của `tags`: Hiện tại đang là `type: String`. Trong thực tế một dự án
+     thường có nhiều tags (ví dụ: Frontend, React, Node.js). Để `String` chỉ lưu được tối đa 1 tag.
+- Cách khắc phục:
+  - Thêm `'none'` vào danh sách Enum:
+      enum: ['none', 'Frontend', 'Backend', ...]
+  - HOẶC (Khuyến nghị) chuyển `tags` sang dạng mảng chuỗi [String]:
+      tags: [{
+          type: String,
+          enum: [
+              'Frontend', 'Backend', 'Fullstack', 'React', 'Node.js',
+              'Express.js', 'MongoDB', 'MySQL', 'Flutter', 'Java',
+              'Python', 'AI', 'Machine Learning', 'DevOps'
+          ]
+      }],
+      default: []
+----Done
+
+--------------------------------------------------------------------------------
+[LỖI 3] THIẾU GIÁ TRỊ MẶC ĐỊNH CHO `postedAt`
+--------------------------------------------------------------------------------
+- Vị trí:
+  - Backend/models/project.js (dòng 75-77)
+  - Backend/controllers/projectController.js (dòng 39)
+- Hiện trạng code:
+  - Model:
+      postedAt: { type: Date }
+  - Controller:
+      postedAt: req.body.postedAt
+- Nguyên nhân & Hậu quả:
+  - Nếu client tạo project mà không gửi trường `postedAt`, giá trị này sẽ bị `undefined` (hoặc null trong DB).
+  - Khi Frontend load danh sách dự án (ví dụ hiển thị "Đăng lúc...", sắp xếp theo ngày đăng),
+    dữ liệu ngày đăng sẽ bị trống hoặc hiển thị "Invalid Date".
+- Cách khắc phục:
+  - Tại Model: Thêm giá trị mặc định:
+      postedAt: { type: Date, default: Date.now }
+  - Tại Controller: Sử dụng fallback nếu client không gửi:
+      postedAt: req.body.postedAt || Date.now()
+
+--------------------------------------------------------------------------------
+[LỖI 4] CẬP NHẬT DỮ LIỆU BỊ GHI ĐÈ BẰNG UNDEFINED TRONG `updateProject`
+--------------------------------------------------------------------------------
+- Vị trí: Backend/controllers/projectController.js (dòng 61-67)
+- Hiện trạng code:
+    findProject.projectName = req.body.projectName;
+    findProject.companyName = req.body.companyName;
+    findProject.logoUrl = req.body.logoUrl;
+    findProject.location = req.body.location;
+    findProject.salary = req.body.salary;
+    findProject.tags = req.body.tags;
+    findProject.description = req.body.description;
+- Nguyên nhân & Hậu quả:
+  - Đoạn code trên gán trực tiếp toàn bộ các trường mà không kiểm tra xem client có gửi trường đó lên hay không.
+  - Nếu client chỉ muốn cập nhật một phần thông tin (ví dụ: chỉ sửa salary hoặc description),
+    các trường còn lại không được gửi trong req.body sẽ có giá trị là `undefined`.
+  - Khi đó, trường companyName (vốn là required: true) bị gán `undefined` -> khi gọi `findProject.save()`,
+    Mongoose sẽ chặn lại với lỗi `Path companyName is required` và trả về mã 500 Internal Server Error!
+- Cách khắc phục:
+  Chỉ cập nhật những trường thực sự được truyền lên (không undefined):
+    if (req.body.projectName !== undefined) findProject.projectName = req.body.projectName;
+    if (req.body.companyName !== undefined) findProject.companyName = req.body.companyName;
+    if (req.body.logoUrl !== undefined) findProject.logoUrl = req.body.logoUrl;
+    if (req.body.location !== undefined) findProject.location = req.body.location;
+    if (req.body.salary !== undefined) findProject.salary = req.body.salary;
+    if (req.body.tags !== undefined) findProject.tags = req.body.tags;
+    if (req.body.description !== undefined) findProject.description = req.body.description;
+----done
+
+--------------------------------------------------------------------------------
+[CẢNH BÁO KIẾN TRÚC] COMMENT OUT TRƯỜNG `status` VÀ API `updateProjectStatus`
+--------------------------------------------------------------------------------
+- Vị trí:
+  - models/project.js (dòng 44-53)
+  - controllers/projectController.js (dòng 92-111, 119)
+  - routes/projectRoutes.js (dòng 11)
+- Nhận xét:
+  - Nếu bạn tạm thời ẩn trường `status`, hệ thống sẽ không theo dõi được vòng đời của dự án
+    (đang tuyển người 'recruiting', đang thực hiện 'working', hay đã hoàn thành 'finished').
+  - Nếu sau này mở lại, hãy lưu ý endpoint đã được cấu hình chuẩn REST là:
+    PUT /api/projects/:id/status (để không bị trùng lặp với PUT /api/projects/:id).
+
+================================================================================
+KẾT LUẬN & ĐỀ XUẤT HÀNH ĐỘNG
+================================================================================
+1. Ưu tiên sửa ngay Lỗi 1 (Cập nhật Joi schema) và Lỗi 2 (Thêm 'none' vào enum hoặc đổi tags thành mảng)
+   để các API tạo và sửa dự án hoạt động được mà không bị văng lỗi 400 và 500.
+2. Thêm default Date.now cho postedAt (Lỗi 3) và kiểm tra undefined trong updateProject (Lỗi 4).
+================================================================================
