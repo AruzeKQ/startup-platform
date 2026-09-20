@@ -51,7 +51,7 @@ const projectSchema = new mongoose.Schema({
     //     default: 'recruiting',
     //     trim: true
     // },
-    tags: {
+    tags: [{
         type: String,
         enum: [
             'Frontend',
@@ -67,11 +67,12 @@ const projectSchema = new mongoose.Schema({
             'Python',
             'AI',
             'Machine Learning',
-            'DevOps'
+            'DevOps',
+            'None'
         ],
-        default: 'none',
+        default: 'None',
 
-    },
+    }],
     postedAt: {
         type: Date
     },
@@ -81,7 +82,13 @@ const projectSchema = new mongoose.Schema({
 function projectValidate(userInfo) {
     const Schema = Joi.object({
         projectName: Joi.string().min(5).max(1024).required(),
-        description: Joi.string().min(5).max(1024),
+        companyName: Joi.string().max(1024).required(),
+        logoUrl: Joi.string().max(1024).allow('', null),
+        location: Joi.string().max(1024).allow('', null),
+        salary: Joi.string().max(1024).allow('', null),
+        description: Joi.string().max(1024).allow('', null),
+        tags: Joi.string().allow('', null),
+        postedAt: Joi.date().allow('', null)
     });
     return Schema.validate(userInfo);
 }

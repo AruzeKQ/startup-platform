@@ -58,13 +58,13 @@ const updateProject = async (req, res) => {
         if (findProject.owner.toString() !== req.user._id.toString()) {
             return res.status(403).send({ message: 'Access denied' });
         }
-        findProject.projectName = req.body.projectName;
-        findProject.companyName = req.body.companyName;
-        findProject.logoUrl = req.body.logoUrl;
-        findProject.location = req.body.location;
-        findProject.salary = req.body.salary;
-        findProject.tags = req.body.tags;
-        findProject.description = req.body.description;
+        if (req.body.projectName !== undefined) findProject.projectName = req.body.projectName;
+        if (req.body.companyName !== undefined) findProject.companyName = req.body.companyName;
+        if (req.body.logoUrl !== undefined) findProject.logoUrl = req.body.logoUrl;
+        if (req.body.location !== undefined) findProject.location = req.body.location;
+        if (req.body.salary !== undefined) findProject.salary = req.body.salary;
+        if (req.body.tags !== undefined) findProject.tags = req.body.tags;
+        if (req.body.description !== undefined) findProject.description = req.body.description;
 
         await findProject.save();
         res.status(200).send({ message: 'Project updated successfully', project: findProject });
