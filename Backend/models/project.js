@@ -10,7 +10,28 @@ const projectSchema = new mongoose.Schema({
         maxlength: 1024,
         required: true
     },
+    companyName: {
+        type: String,
+        trim: true,
+        maxlength: 1024,
+        required: true
+    },
+    logoUrl: {
+        type: String,
+        trim: true,
+        maxlength: 1024
+    },
+    location: {
+        type: String,
+        trim: true,
+        maxlength: 1024
+    },
     description: {
+        type: String,
+        trim: true,
+        maxlength: 1024
+    },
+    salary: {
         type: String,
         trim: true,
         maxlength: 1024
@@ -20,15 +41,39 @@ const projectSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
-    status: {
+    // status: {
+    //     type: String,
+    //     enum: [
+    //         'recruiting',
+    //         'working',
+    //         'finished'
+    //     ],
+    //     default: 'recruiting',
+    //     trim: true
+    // },
+    tags: {
         type: String,
         enum: [
-            'recruiting',
-            'working',
-            'finished'
+            'Frontend',
+            'Backend',
+            'Fullstack',
+            'React',
+            'Node.js',
+            'Express.js',
+            'MongoDB',
+            'MySQL',
+            'Flutter',
+            'Java',
+            'Python',
+            'AI',
+            'Machine Learning',
+            'DevOps'
         ],
-        default: 'recruiting',
-        trim: true
+        default: 'none',
+
+    },
+    postedAt: {
+        type: Date
     },
 
 });
