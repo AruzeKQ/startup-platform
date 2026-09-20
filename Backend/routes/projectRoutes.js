@@ -3,7 +3,7 @@ const router = express.Router();
 const projectController = require('../controllers/projectController');
 const auth = require('../middlewares/auth');
 
-router.get('/', projectController.getProject);
+router.get('/:id', projectController.getProject);
 router.post('/projects', auth, projectController.createProject);
 router.put('/projects/:id', auth, projectController.updateProject);
 router.delete('/projects/:id', auth, projectController.deleteProject);

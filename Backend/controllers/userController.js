@@ -33,7 +33,7 @@ const updateProfile = async (req, res) => {
         if (!user) {
             return res.status(404).send({ message: 'User not found' });
         }
-        
+
         res.status(200).send({ message: 'Profile updated successfully', user });
     } catch (error) {
         res.status(500).send({ message: error.message });
@@ -83,4 +83,4 @@ module.exports = {
     updateProfile,
     changePassword,
     deleteAccount
-};
+};
