@@ -2,8 +2,10 @@ const BASE_URL = 'http://localhost:3000/api'
 
 async function fetchClient(endpoint, { method = 'GET', data, ...customConfig } = {}) {
     // khai báo header
+    const token = typeof localStorage !== 'undefined' ? localStorage.getItem('token') : null;
     const headers = {
         'Content-Type': 'application/json',
+        ...(token ? { 'x-auth-token': token } : {}),
     }
 
     // ghi đè nếu như có một thuộc tính header mới
@@ -30,7 +32,8 @@ async function fetchClient(endpoint, { method = 'GET', data, ...customConfig } =
 
 
         if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${result}`)
+            const errorText = typeof result === 'object' ? (result.message || JSON.stringify(result)) : result;
+            throw new Error(`HTTP ${response.status}: ${errorText}`)
         }
 
         return result;

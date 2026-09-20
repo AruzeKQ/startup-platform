@@ -16,6 +16,7 @@ const memberListSchema = mongoose.Schema({
     role: {
         type: String,
         enum: [
+            'none',
             'FE',
             'BE',
         ],
@@ -23,7 +24,7 @@ const memberListSchema = mongoose.Schema({
     },
     joinedAt: {
         type: Date,
-        default: Date.now()
+        default: Date.now
     }
 });
 

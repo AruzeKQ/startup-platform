@@ -21,19 +21,23 @@ const userSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
-    password: pwdComplexity({
-        min: 6,
-        max: 1024,
-        lowerCase: 1,
-        upperCase: 1,
-        numeric: 1,
-        symbol: 1,
-        requirementCount: 4
-    }),
+    password: {
+        type: String,
+        required: true
+    },
     role: {
         type: String
     },
-
+    portfolioLink: {
+        type: String,
+        trim: true,
+        default: ''
+    },
+    skills: {
+        type: String,
+        trim: true,
+        default: ''
+    }
 });
 
 userSchema.methods.generateAuthToken = function () {
