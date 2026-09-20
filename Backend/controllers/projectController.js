@@ -1,5 +1,14 @@
 const { Project, projectValidate } = require('../models/project');
 
+const getAllProjects = async (req, res) => {
+    try {
+        const projects = await Project.find().populate('owner', 'name email').sort({ _id: -1 });
+        res.status(200).send(projects);
+    } catch (error) {
+        res.status(500).send({ message: error.message });
+    }
+};
+
 const getProject = async (req, res) => {
     try {
         const project = await Project.findById(req.params.id).populate('owner', 'name email');
@@ -14,6 +23,10 @@ const getProject = async (req, res) => {
 
 const createProject = async (req, res) => {
     try {
+        const result = projectValidate(req.body);
+        if (result.error) {
+            return res.status(400).send({ message: result.error.details[0].message });
+        }
         const project = new Project({
             projectName: req.body.projectName,
             description: req.body.description,
@@ -87,6 +100,7 @@ const updateProjectStatus = async (req, res) => {
 };
 
 module.exports = {
+    getAllProjects,
     getProject,
     updateProject,
     deleteProject,

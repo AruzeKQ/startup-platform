@@ -7,6 +7,7 @@ const authRouter = require('./routes/authRoutes');
 const userRouter = require('./routes/userRoutes');
 const projectRouter = require('./routes/projectRoutes');
 const taskRouter = require('./routes/taskRoutes');
+const memberListRouter = require('./routes/memberListRoute');
 const app = express();
 
 app.use(cors({
@@ -24,7 +25,8 @@ app.use('/api/users', userRouter);
 app.use('/api/projects', projectRouter);
 //tasks router
 app.use('/api/tasks', taskRouter);
-//app.use('/api/tasks', taskRouter);
+//members router
+app.use('/api', memberListRouter);
 //chat router
 
 //documents router
