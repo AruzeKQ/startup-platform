@@ -1,15 +1,15 @@
 import React from 'react';
 
 export default function ProjectCard({ project, onApply }) {
-  const { title, companyName, logo, location, salary, tags, description, postedAt } = project;
+  const { companyName, description, location, logoUrl, projectName, salary, tags, postedAt } = project;
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
       <div>
         <div className="flex items-center gap-4 mb-4">
-          <img src={logo || 'https://via.placeholder.com/48'} alt={companyName} className="w-12 h-12 rounded-lg object-cover border border-gray-100" />
+          <img src={logoUrl} alt={companyName} className="w-12 h-12 rounded-lg object-cover border border-gray-100" />
           <div>
-            <h3 className="font-semibold text-lg text-gray-900 line-clamp-1">{title}</h3>
+            <h3 className="font-semibold text-lg text-gray-900 line-clamp-1">{projectName}</h3>
             <p className="text-sm text-gray-500">{companyName}</p>
           </div>
         </div>
