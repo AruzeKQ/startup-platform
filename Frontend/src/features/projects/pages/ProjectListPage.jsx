@@ -5,32 +5,6 @@ import ProjectCard from '../components/ProjectCard';
 import ApplyModal from '../components/ApplyModal';
 import ProjectFilter from '../components/ProjectFilter';
 
-// const MOCK_PROJECTS = [
-//   {
-//     id: 1,
-//     title: 'Frontend React Developer (E-commerce)',
-//     companyName: 'TechStartup X',
-//     logo: 'https://api.dicebear.com/7.x/shapes/svg?seed=TechX',
-//     location: 'Hà Nội (Hybrid)',
-//     salary: 'Thỏa thuận / Share Equity',
-//     postedAt: '2 giờ trước',
-//     description: 'Xây dựng giao diện sàn thương mại điện tử kết nối các nhà bán lẻ nhỏ.',
-//     tags: ['React', 'JavaScript', 'Tailwind', 'Redux'],
-//   },
-//   {
-//     id: 2,
-//     title: 'Fullstack Node.js & React Developer',
-//     companyName: 'AI Solution Lab',
-//     logo: 'https://api.dicebear.com/7.x/shapes/svg?seed=AILab',
-//     location: 'TP. Hồ Chí Minh (Remote)',
-//     salary: '10 - 15 triệu / tháng',
-//     postedAt: '1 ngày trước',
-//     description: 'Dự án phân tích dữ liệu mạng xã hội bằng AI.',
-//     tags: ['React', 'Node.js', 'Express', 'MongoDB'],
-//   }
-// ];
-
-
 export default function ProjectListPage() {
   const [selectedProject, setSelectedProject] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -41,7 +15,7 @@ export default function ProjectListPage() {
       try {
         const response = await projectApi.getProject();
         setProjects(response);
-        console.log(projects);
+        console.log(response);
       } catch (error) {
         console.log("Đã xảy ra lỗi khi lấy data về", error);
       }
@@ -69,13 +43,15 @@ export default function ProjectListPage() {
 
         {/* Project Grid mapping Component ProjectCard */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* {projects.map((project) => (
-            <ProjectCard
-              key={project.id}
-              project={project}
-              onApply={handleOpenApplyModal}
-            />
-          ))} */}
+          {
+            projects.map((project) => (
+              <ProjectCard
+                key={project._id}
+                project={project}
+                onApply={handleOpenApplyModal}
+              />
+            ))
+          }
         </div>
       </div>
 

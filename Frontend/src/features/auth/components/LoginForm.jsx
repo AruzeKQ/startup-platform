@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { userContext } from '../../../contexts/authContext';
 import { Link } from 'react-router-dom';
 import { authApi } from '../services/authApi';
 
 export default function LoginForm() {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [checked, setChecked] = useState(null)
+  const [user, setUser] = useState(null)
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -13,6 +15,7 @@ export default function LoginForm() {
         email: formData.email,
         password: formData.password,
       });
+
       window.location.href = '/';
     } catch (error) {
       console.log('Đã xảy ra lỗi', error);
