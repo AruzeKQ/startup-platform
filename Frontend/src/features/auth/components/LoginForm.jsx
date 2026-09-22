@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
+import { useContext } from 'react';
+import { userContext } from '../../../contexts/authContext';
 import { Link } from 'react-router-dom';
 import { authApi } from '../services/authApi';
 
 export default function LoginForm() {
-  const [formData, setFormData] = useState({ email: '', password: '' });
-  const [checked, setChecked] = useState(null)
+  const [formData, setFormData] = useState({ email: '', password: '' });;
+  const [checked, setChecked] = useState(null);
+  const { setUser, setToken } = useContext(userContext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -13,6 +16,13 @@ export default function LoginForm() {
         email: formData.email,
         password: formData.password,
       });
+      // lưu token
+      localStorage.setItem('token', response.token);
+      setToken(response.token);
+      // lưu data user
+      localStorage.setItem('user', JSON.stringify(response.user))
+      setUser()
+      // chuyển hướng về trang chính thức
       window.location.href = '/';
     } catch (error) {
       console.log('Đã xảy ra lỗi', error);
