@@ -63,5 +63,18 @@ const updateReview = async (req, res) => {
 };
 
 const deleteReview = async (req, res) => {
-
+    try {
+        const { reviewId } = req.params;
+        const findReview = Review.findById(reviewId);
+        if (!findReview) {
+            return res.status(404).send({ message: 'Review not exists' });
+        }
+        if (!findReview.reviewer.toString() !== req.user._id.toString()) {
+            return res.status(403).send({ message: 'Access denied' });
+        }
+        const deleted = await Review.findByIdAndDelete(reviewId);
+        return res.status(200).send({ message: 'Delete successfully', review: deleted });
+    } catch (err) {
+        res.status(500).send({ message: error.message });
+    }
 };
