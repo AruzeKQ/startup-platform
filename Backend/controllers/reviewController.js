@@ -8,8 +8,8 @@ const createReview = async (req, res) => {
         const { project, reviewee, rating, comment } = req.body;
         const reviewerId = req.user._id;
 
-        if (!projectId || !revieweeId || !rating) {
-            return res.status(400).send({ message: 'ProjectId, revieweeId, rating is required' });
+        if (!project || !reviewee || !rating) {
+            return res.status(400).send({ message: 'Project, reviewee, rating is required' });
         }
         if (rating < 1 || rating > 5) {
             return res.status(400).send({ message: 'Rating must in 1 to 5' });
@@ -56,4 +56,12 @@ const createReview = async (req, res) => {
     } catch (error) {
         res.status(500).send({ message: error.message });
     }
+};
+
+const updateReview = async (req, res) => {
+
+};
+
+const deleteReview = async (req, res) => {
+
 };
