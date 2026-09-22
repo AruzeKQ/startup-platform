@@ -2,6 +2,8 @@ const { Review } = require('../models/review');
 const { Project } = require('../models/project');
 const { memberList } = require('../models/memberList');
 const { User } = require('../models/user');
+const { reduce } = require('lodash');
+const { number } = require('joi');
 
 const createReview = async (req, res) => {
     try {
@@ -58,12 +60,37 @@ const createReview = async (req, res) => {
     }
 };
 
+const getUserReview = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const findReviews = await Review.find({ reviewee: userId })
+            .populate('reviewer', 'name email')
+            .populate('project', 'projectName')
+            .sort({ id: -1 });
+
+        let avgRating = 0;
+        const totalReview = findReviews.length;
+        if (totalReview > 0) {
+            const totalRating = findReviews.reduce((sum, review) => {
+                return sum + review.rating;
+            });
+            avgRating = totalRating / totalReview;
+        }
+        else {
+            avgRating = 0;
+        }
+        return res.status(200).send({ totalReview, avgRating: Number(avgRating) })
+    } catch (error) {
+        res.status(500).send({ message: error.message });
+    }
+};
+
 const updateReview = async (req, res) => {
     try {
         const { reviewId } = req.params;
         const { rating, comment } = req.body;
 
-        const findReview = Review.findById(reviewId);
+        const findReview = await Review.findById(reviewId);
         if (!findReview) {
             return res.status(404).send({ message: 'Review not exists' });
         }
@@ -88,7 +115,7 @@ const updateReview = async (req, res) => {
 const deleteReview = async (req, res) => {
     try {
         const { reviewId } = req.params;
-        const findReview = Review.findById(reviewId);
+        const findReview = await Review.findById(reviewId);
         if (!findReview) {
             return res.status(404).send({ message: 'Review not exists' });
         }
