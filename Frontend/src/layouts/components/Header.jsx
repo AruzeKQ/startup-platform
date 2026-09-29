@@ -53,6 +53,10 @@ export default function Header() {
             {user ? (
               <>
                 <p className='text-sm font-semibold'>Hello con vợ, {user.name}</p>
+                {user.role === 'startup' &&
+                  <Link to="/post-project" className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-4 py-2 rounded-lg text-sm transition-colors shadow-sm">
+                    Đăng dự án (Startup)
+                  </Link>}
                 <button
                   onClick={handleLogout}
                   className='text-sm text-gray-500 font-medium hover:text-red-600 transition-colors cursor-pointer'>
@@ -70,9 +74,6 @@ export default function Header() {
                 </Link>
               </>
             )}
-
-            { }
-
 
             {/* <Link to="/post-project" className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-4 py-2 rounded-lg text-sm transition-colors shadow-sm">
               Đăng dự án (Startup)

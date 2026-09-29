@@ -1,0 +1,70 @@
+src/
+├── assets/                 # Tài nguyên tĩnh dùng chung
+│   ├── images/             # Hình ảnh (png, jpg, svg)
+│   ├── icons/              # Các file SVG icons tùy chỉnh
+│   └── styles/             # Global styles, Tailwind config, biến CSS
+│
+├── components/             # Các UI components dùng chung toàn ứng dụng (Atomic / Dumb components)
+│   ├── Button/             # Ví dụ: Button tái sử dụng
+│   │   ├── Button.jsx
+│   │   └── Button.module.css (hoặc style.js)
+│   ├── Input/
+│   ├── Modal/
+│   └── Card/
+│
+├── constants/              # Hằng số toàn cục (API endpoints, roles, app config)
+│   ├── apiEndpoints.js
+│   └── appConstants.js
+│
+├── context/                # React Context API (nếu không dùng Redux/Zustand)
+│   └── AuthContext.jsx
+│
+├── hooks/                  # Custom React Hooks dùng chung
+│   ├── useDebounce.js
+│   └── useLocalStorage.js
+│
+├── layouts/                # Các khung layout chung của trang
+│   ├── MainLayout.jsx      # Layout cho trang chủ, danh sách dự án (có Header, Footer)
+│   ├── DashboardLayout.jsx # Layout cho trang quản trị của Startup/User (có Sidebar)
+│   └── AuthLayout.jsx      # Layout cho trang Login, Register (giao diện tập trung)
+│
+├── pages/                  # Các trang đơn giản không thuộc một feature lớn hoặc trang tĩnh
+│   ├── Home.jsx            # Trang chủ
+│   └── NotFound.jsx        # Trang 404
+│
+├── features/               # 🌟 TRÁI TIM CỦA DỰ ÁN: Chia nhỏ theo từng tính năng nghiệp vụ
+│   ├── auth/               # Tính năng Đăng nhập / Đăng ký
+│   │   ├── components/     # Component riêng cho Auth (LoginForm, RegisterForm)
+│   │   ├── services/       # API calls riêng cho Auth (loginApi.js)
+│   │   └── pages/          # LoginPage, RegisterPage
+│   │
+│   ├── startup/            # Quản lý hồ sơ/thông tin Startup
+│   │   ├── components/     # StartupCard, StartupProfileForm
+│   │   ├── services/       # startupApi.js
+│   │   └── pages/          # CreateStartupPage, StartupProfilePage
+│   │
+│   ├── projects/           # Quản lý Dự án (Đăng dự án, xem danh sách, chi tiết)
+│   │   ├── components/     # ProjectCard, ProjectFilter, ApplyModal
+│   │   ├── services/       # projectApi.js
+│   │   └── pages/          # ProjectListPage, ProjectDetailPage, CreateProjectPage
+│   │
+│   └── applications/       # Quản lý ứng tuyển (Ứng viên apply vào dự án, Startup duyệt hồ sơ)
+│       ├── components/     # ApplicationTable, StatusBadge
+│       ├── services/       # applicationApi.js
+│       └── pages/          # MyApplicationsPage, ManageApplicantsPage
+│
+├── routes/                 # Định nghĩa hệ thống đường dẫn (Routing)
+│   ├── AppRoutes.jsx       # File chính chứa toàn bộ Routes
+│   ├── PrivateRoute.jsx    # Component bảo vệ các route cần đăng nhập
+│   └── RoleBasedRoute.jsx  # Phân quyền route cho Startup hay Candidate
+│
+├── services/               # Cấu hình Axios/Fetch client dùng chung
+│   ├── axiosClient.js      # Khởi tạo axios instance, interceptors (gắn token, refresh token)
+│   └── storage.js          # Xử lý localStorage / sessionStorage
+│
+├── utils/                  # Các hàm tiện ích (Format tiền tệ, ngày tháng, validate form)
+│   ├── formatters.js       # Ví dụ: formatCurrency, formatDate
+│   └── validators.js       # Kiểm tra email, password hợp lệ
+│
+├── App.jsx                 # Root component
+└── main.jsx                # Điểm khởi chạy (Entry point của React)
