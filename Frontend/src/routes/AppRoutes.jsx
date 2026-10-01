@@ -1,7 +1,7 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 // Import PublicRoute
-import { PublicRoute } from './PublicRoute';
+import PublicRoute from './PublicRoute';
 // Import PrivateRoute
 import PrivateRoute from './PrivateRoute';
 
@@ -13,6 +13,9 @@ import ProjectListPage from '../features/projects/pages/ProjectListPage';
 // Import Auth Pages
 import LoginPage from '../features/auth/pages/LoginPage';
 import RegisterPage from '../features/auth/pages/RegisterPage';
+
+// Import PostProject Page
+import PostProjectPage from '../features/projects/pages/PostProjectPage';
 
 export default function AppRoutes() {
   return (
@@ -37,9 +40,14 @@ export default function AppRoutes() {
       />
 
       <Route element={<PrivateRoute />}>
-        <Route path="/projects/create" element={<MainLayout><CreateProjectPage /></MainLayout>} />
-        <Route path="/profile" element={<MainLayout><ProfilePage /></MainLayout>} />
-        <Route path="/my-projects" element={<MainLayout><MyProjectsPage /></MainLayout>} />
+        <Route
+          path="/post-project"
+          element={
+            <MainLayout>
+              <PostProjectPage />
+            </MainLayout>
+          }
+        />
       </Route>
 
       {/* Nhóm các route không dùng Layout chung (như Login, Register) */}
@@ -49,6 +57,8 @@ export default function AppRoutes() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
       </Route>
+
+
 
       {/* Route bắt các đường dẫn không tồn tại (404) */}
       {/* <Route path="*" element={<NotFoundPage />} /> */}
