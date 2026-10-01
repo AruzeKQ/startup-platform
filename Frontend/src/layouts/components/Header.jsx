@@ -4,11 +4,10 @@ import { useContext } from 'react';
 import { userContext } from '../../contexts/authContext';
 
 export default function Header() {
-  const { user, setUser, setToken } = useContext(userContext);
+  const { user, token, setUser, setToken } = useContext(userContext);
   console.log(user);
   const handleLogout = () => {
-    localStorage.removeItem('user');
-    localStorage.removeItem('user')
+    localStorage.clear();
     setUser(null);
     setToken(null);
     window.location.href = '/';
@@ -52,7 +51,7 @@ export default function Header() {
 
             {user ? (
               <>
-                <p className='text-sm font-semibold'>Hello con vợ, {user.name}</p>
+                <p className='text-sm font-semibold'>Hello con vợ, <strong>{user.name}</strong></p>
                 {user.role === 'startup' &&
                   <Link to="/post-project" className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-4 py-2 rounded-lg text-sm transition-colors shadow-sm">
                     Đăng dự án (Startup)
@@ -75,9 +74,6 @@ export default function Header() {
               </>
             )}
 
-            {/* <Link to="/post-project" className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-4 py-2 rounded-lg text-sm transition-colors shadow-sm">
-              Đăng dự án (Startup)
-            </Link> */}
           </div>
         </div>
       </div>
