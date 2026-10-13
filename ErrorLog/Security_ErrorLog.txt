@@ -1,0 +1,156 @@
+================================================================================
+BÁO CÁO LỖI BẢO MẬT - SECURITY AUDIT REPORT
+Dự án: startup-platform | Backend: Node.js / Express / Mongoose
+Ngày kiểm tra: 27/09/2026
+================================================================================
+
+[TỔNG QUAN]
+Phân tích toàn bộ mã nguồn Backend và Frontend, phát hiện 10 vấn đề bảo mật,
+trong đó 3 nghiêm trọng, 4 trung bình, 3 nhẹ.
+
+================================================================================
+[NGHIÊM TRỌNG - 3 vấn đề]
+================================================================================
+
+[1] JWT KHÔNG CÓ THỜI GẠN HẾT HẠN
+- Vị trí: Backend/models/user.js (dòng 43-48)
+- Hiện trạng:
+    userSchema.methods.generateAuthToken = function () {
+        const token = jwt.sign(
+            { _id: this._id },
+            process.env.JWT_SECRET
+        );
+        return token;
+    }
+- Rủi ro: Token có hiệu lực vĩnh viễn. Nếu token bị lộ (log, network sniff,
+  XSS), kẻ tấn công có thể sử dụng vô thời hạn.
+- Cách sửa: Thêm expiresIn
+    jwt.sign({ _id: this._id }, process.env.JWT_SECRET, { expiresIn: '7d' })
+
+[2] KHÔNG CÓ RATE LIMITING
+- Vị trí: Toàn bộ API endpoints
+- Rủi ro:
+  + Endpoint /api/auth/login bị brute-force (thử hàng nghìn mật khẩu)
+  + Endpoint /api/auth/register bị spam tạo tài khoản
+  + Endpoint /api/projects bị khai tài nguyên (DoS nhỏ)
+- Cách sửa: Cài express-rate-limit
+    npm i express-rate-limit
+    const rateLimit = require('express-rate-limit');
+    const authLimiter = rateLimit({
+        windowMs: 15 * 60 * 1000,
+        max: 20,
+        message: { message: 'Too many attempts, try again later' }
+    });
+    app.use('/api/auth', authLimiter);
+
+[3] THIẾU SECURITY HEADERS
+- Vị trí: Backend/app.js
+- Rủi ro: Không có headers bảo mật như:
+  + X-Content-Type-Options: nosniff (chặn MIME sniffing)
+  + X-Frame-Options: DENY (chặn clickjacking)
+  + Strict-Transport-Security (force HTTPS)
+  + Content-Security-Policy (chặn XSS)
+- Cách sửa: Cài helmet
+    npm i helmet
+    const helmet = require('helmet');
+    app.use(helmet());
+
+================================================================================
+[TRUNG BÌNH - 4 vấn đề]
+================================================================================
+
+[4] CORS HARD-CODE ORIGIN
+- Vị trí: Backend/app.js (dòng 14-17)
+- Hiện trạng:
+    app.use(cors({
+        origin: 'http://localhost:5173',
+        credentials: true,
+    }));
+- Rủi ro: Khi deploy production với domain khác, frontend sẽ không truy cập được API.
+  Nguy hiểm hơn nếu đổi thành origin: '*' vì mở cho mọi domain.
+- Cách sửa: Dùng biến môi trường
+    app.use(cors({
+        origin: process.env.CLIENT_URL || 'http://localhost:5173',
+        credentials: true,
+    }));
+    Trong .env: CLIENT_URL=https://your-production-domain.com
+
+[5] ERROR MESSAGE LỘ CHI TIẾT
+- Vị trí: Tất cả controller files
+- Hiện trạng: res.status(500).send({ message: error.message })
+- Rủi ro: error.message có thể lộ:
+  + Stack trace, tên file, số dòng lỗi
+  + Tên collection MongoDB, cấu trúc schema
+  + Chi tiết database connection
+- Cách sửa:
+    if (process.env.NODE_ENV === 'production') {
+        res.status(500).send({ message: 'Internal server error' });
+    } else {
+        res.status(500).send({ message: error.message });
+    }
+
+[6] BCRYPT SALT ROUNDS THẤP
+- Vị trí: Backend/controllers/authController.js (dòng 24)
+- Hiện trạng: await bcrypt.genSalt(10)
+- Rủi ro: 10 rounds có thể bị GPU hiện đại brute-force nhanh hơn.
+- Cách sửa: Tăng lên 12
+    const salt = await bcrypt.genSalt(12);
+
+[7] KHÔNG CÓ INPUT SANITIZATION (XSS RISK)
+- Vị trí: Toàn bộ text fields (description, name, companyName...)
+- Rủi ro: Nếu client gửi '<script>alert(1)</script>' và frontend render bằng
+  dangerouslySetInnerHTML, sẽ xảy ra XSS. Hiện tại dùng React (tự escape)
+  nên rủi ro thấp hơn nhưng vẫn nên phòng ngừa.
+- Cách sửa: Dùng DOMPurify hoặc validate/sanitize bằng Joi custom rules
+
+================================================================================
+[NHẸ - 3 vấn đề]
+================================================================================
+
+[8] KHÔNG CÓ REFRESH TOKEN
+- Vị trí: Auth flow
+- Rủi ro: Khi access token hết hạn (sau khi fix #1), user bị logout đột ngột.
+- Cách sửa: Implement refresh token flow (httpOnly cookie + refresh endpoint)
+
+[9] KHÔNG LOG SECURITY EVENTS
+- Vị trí: Toàn bộ
+- Rủi ro: Không phát hiện được:
+  + Nhiều lần login thất bại (brute-force)
+  + Token không hợp lệ được gửi lên
+  + Request từ IP lạ
+- Cách sửa: Ghi log khi có login thất bại, token invalid
+
+[10] KHÔNG CÓ HTTPS ENFORCEMENT
+- Vị trí: Backend/app.js
+- Rủi ro: Khi deploy, user truy cập qua HTTP thay vì HTTPS → token bị đánh cắp.
+- Cách sửa:
+    if (process.env.NODE_ENV === 'production') {
+        app.use((req, res, next) => {
+            if (req.header('x-forwarded-proto') !== 'https') {
+                res.redirect('https://' + req.header('host') + req.url);
+            } else {
+                next();
+            }
+        });
+    }
+
+================================================================================
+[DANH SÁCH THƯ VIỆN CÀI ĐẶT THÊM]
+================================================================================
+  npm i helmet
+  npm i express-rate-limit
+  npm i cookie-parser        (nếu làm refresh token)
+
+================================================================================
+[ƯU TIÊN KHẮC PHỤC]
+================================================================================
+  1. [Nghiêm trọng] Thêm expiresIn cho JWT           (5 phút)
+  2. [Nghiêm trọng] Cài helmet + express-rate-limit   (15 phút)
+  3. [Trung bình]   Tăng bcrypt salt lên 12           (1 phút)
+  4. [Trung bình]   Dùng biến môi trường cho CORS      (5 phút)
+  5. [Trung báo]    Ẩn error message khi production    (10 phút)
+  6. [Trung báo]    Thêm input sanitization            (30 phút)
+
+================================================================================
+KẾT THÚC BÁO CÁO
+================================================================================

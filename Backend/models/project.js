@@ -87,7 +87,7 @@ function projectValidate(userInfo) {
         location: Joi.string().max(1024).allow('', null),
         salary: Joi.string().max(1024).allow('', null),
         description: Joi.string().max(1024).allow('', null),
-        tags: Joi.string().allow('', null),
+        tags: Joi.array().items(Joi.string()),
         postedAt: Joi.date().allow('', null)
     });
     return Schema.validate(userInfo);
