@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const taskController = require('../controllers/taskController');
 const auth = require('../middlewares/auth');
-const apiLimiter = require('../middlewares/apiLimiter');
 
 router.post('/', auth, taskController.createTask);
 router.get('/my-tasks', auth, taskController.getMyTasks);
