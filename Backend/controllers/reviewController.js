@@ -2,8 +2,6 @@ const { Review } = require('../models/review');
 const { Project } = require('../models/project');
 const { memberList } = require('../models/memberList');
 const { User } = require('../models/user');
-const { reduce } = require('lodash');
-const { number } = require('joi');
 
 const createReview = async (req, res) => {
     try {
@@ -127,4 +125,11 @@ const deleteReview = async (req, res) => {
     } catch (err) {
         res.status(500).send({ message: error.message });
     }
+};
+
+module.exports = {
+    createReview,
+    getUserReview,
+    updateReview,
+    deleteReview
 };
