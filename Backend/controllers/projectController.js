@@ -23,6 +23,14 @@ const getProject = async (req, res) => {
 
 const createProject = async (req, res) => {
     try {
+        if (typeof req.body.tags === 'string') {
+            try {
+                req.body.tags = JSON.parse(req.body.tags);
+            } catch (err) {
+                return res.status(400).send({ message: 'tags not is not a correct JSON format' });
+            }
+        }
+
         const result = projectValidate(req.body);
         if (result.error) {
             return res.status(400).send({ message: result.error.details[0].message });
@@ -47,6 +55,14 @@ const createProject = async (req, res) => {
 
 const updateProject = async (req, res) => {
     try {
+        if (typeof req.body.tags === 'string') {
+            try {
+                req.body.tags = JSON.parse(req.body.tags);
+            } catch (err) {
+                return res.status(400).send({ message: 'tags not is not a correct JSON format' });
+            }
+        }
+
         const result = projectValidate(req.body);
         if (result.error) {
             return res.status(400).send({ message: result.error.details[0].message });
