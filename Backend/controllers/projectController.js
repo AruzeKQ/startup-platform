@@ -21,6 +21,18 @@ const getProject = async (req, res) => {
     }
 };
 
+const getMyProject = async (req, res) => {
+    try {
+        const myProjects = await Project.find({ owner: req.user._id }).populate('owner', 'name email');
+        if (!myProjects) {
+            return res.status(404).send({ message: 'You dont have any project' });
+        }
+        res.status(200).send(myProjects);
+    } catch (error) {
+        res.status(500).send({ message: error.message });
+    }
+}
+
 const createProject = async (req, res) => {
     try {
         if (typeof req.body.tags === 'string') {
@@ -129,6 +141,7 @@ const deleteProject = async (req, res) => {
 module.exports = {
     getAllProjects,
     getProject,
+    getMyProject,
     updateProject,
     deleteProject,
     createProject,

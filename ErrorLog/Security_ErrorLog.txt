@@ -1,3 +1,7 @@
+Thêm refresh token / access token
+OpenID connect
+
+
 ================================================================================
 BÁO CÁO LỖI BẢO MẬT - SECURITY AUDIT REPORT
 Dự án: startup-platform | Backend: Node.js / Express / Mongoose
@@ -26,6 +30,8 @@ trong đó 3 nghiêm trọng, 4 trung bình, 3 nhẹ.
   XSS), kẻ tấn công có thể sử dụng vô thời hạn.
 - Cách sửa: Thêm expiresIn
     jwt.sign({ _id: this._id }, process.env.JWT_SECRET, { expiresIn: '7d' })
+
+    -----------done
 
 [2] KHÔNG CÓ RATE LIMITING
 - Vị trí: Toàn bộ API endpoints

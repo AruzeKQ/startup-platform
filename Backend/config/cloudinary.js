@@ -25,7 +25,7 @@ const uploadToCloudinary = (fileBuffer, originalname, folderName = 'startup_docu
         const uploadStream = cloudinary.uploader.upload_stream(
             {
                 folder: folderName,
-                resource_type: 'auto', // Tự động nhận diện image, raw file (pdf, docs, zip)
+                resource_type: 'auto',
                 use_filename: true,
                 filename_override: originalname,
             },
