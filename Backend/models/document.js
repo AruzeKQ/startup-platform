@@ -33,17 +33,6 @@ const documentSchema = mongoose.Schema({
 
 const Document = mongoose.model('Document', documentSchema);
 
-function validateDocument(doc) {
-    const schema = Joi.object({
-        name: Joi.string().min(1).max(255).required(),
-        url: Joi.string().uri().required(),
-        fileType: Joi.string().allow('', null).optional(),
-        fileSize: Joi.number().min(0).optional()
-    });
-    return schema.validate(doc);
-}
-
 module.exports = {
-    Document,
-    validateDocument
+    Document
 };
