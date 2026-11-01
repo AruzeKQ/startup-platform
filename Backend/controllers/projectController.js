@@ -21,6 +21,15 @@ const getProject = async (req, res) => {
     }
 };
 
+const getMyProjects = async (req, res) => {
+    try {
+        const projects = await Project.find({ owner: req.user._id }).populate('owner', 'name email').sort({ _id: -1 });
+        res.status(200).send(projects);
+    } catch (error) {
+        res.status(500).send({ message: error.message });
+    }
+};
+
 const createProject = async (req, res) => {
     try {
         if (typeof req.body.tags === 'string') {
@@ -129,6 +138,7 @@ const deleteProject = async (req, res) => {
 module.exports = {
     getAllProjects,
     getProject,
+    getMyProjects,
     updateProject,
     deleteProject,
     createProject,
