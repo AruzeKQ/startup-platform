@@ -21,8 +21,25 @@ const getProject = async (req, res) => {
     }
 };
 
+const getMyProjects = async (req, res) => {
+    try {
+        const projects = await Project.find({ owner: req.user._id }).populate('owner', 'name email').sort({ _id: -1 });
+        res.status(200).send(projects);
+    } catch (error) {
+        res.status(500).send({ message: error.message });
+    }
+};
+
 const createProject = async (req, res) => {
     try {
+        if (typeof req.body.tags === 'string') {
+            try {
+                req.body.tags = JSON.parse(req.body.tags);
+            } catch (err) {
+                return res.status(400).send({ message: 'tags not is not a correct JSON format' });
+            }
+        }
+
         const result = projectValidate(req.body);
         if (result.error) {
             return res.status(400).send({ message: result.error.details[0].message });
@@ -47,6 +64,14 @@ const createProject = async (req, res) => {
 
 const updateProject = async (req, res) => {
     try {
+        if (typeof req.body.tags === 'string') {
+            try {
+                req.body.tags = JSON.parse(req.body.tags);
+            } catch (err) {
+                return res.status(400).send({ message: 'tags not is not a correct JSON format' });
+            }
+        }
+
         const result = projectValidate(req.body);
         if (result.error) {
             return res.status(400).send({ message: result.error.details[0].message });
@@ -113,6 +138,7 @@ const deleteProject = async (req, res) => {
 module.exports = {
     getAllProjects,
     getProject,
+    getMyProjects,
     updateProject,
     deleteProject,
     createProject,

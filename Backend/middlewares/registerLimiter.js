@@ -1,0 +1,13 @@
+const rateLimit = require('express-rate-limit');
+
+const registerLimiter = rateLimit({
+    windowMs: 2 * 60 * 1000,
+    limit: 10,
+    standardHeaders: 'draft-8',
+    legacyHeaders: false,
+    message: {
+        message: 'Too many attempts, please try again'
+    }
+});
+
+module.exports = registerLimiter;

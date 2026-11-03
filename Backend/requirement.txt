@@ -7,3 +7,4 @@ lodash
 bcrypt
 dotenv
 jsonwebtoken
+express-rate-limit

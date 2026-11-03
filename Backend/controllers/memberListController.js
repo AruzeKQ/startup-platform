@@ -114,4 +114,4 @@ module.exports = {
     addMember,
     deleteMember,
     updateMemberRole
-};
+};
