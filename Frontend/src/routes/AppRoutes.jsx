@@ -7,6 +7,8 @@ import PrivateRoute from './PrivateRoute';
 
 // Import Layouts
 import MainLayout from '../layouts/MainLayout';
+import DashboardLayout from '../layouts/DashboardLayout';
+
 // Import Pages
 import ProjectListPage from '../features/projects/pages/ProjectListPage';
 
@@ -16,6 +18,11 @@ import RegisterPage from '../features/auth/pages/RegisterPage';
 
 // Import PostProject Page
 import PostProjectPage from '../features/projects/pages/PostProjectPage';
+
+// Import Dashboard Pages
+import DashboardOverviewPage from '../features/dashboard/pages/DashboardOverviewPage';
+import MyProjectsPage from '../features/dashboard/pages/MyProjectsPage';
+import ProjectDetailPage from '../features/dashboard/pages/ProjectDetailPage';
 
 export default function AppRoutes() {
   return (
@@ -46,6 +53,32 @@ export default function AppRoutes() {
             <MainLayout>
               <PostProjectPage />
             </MainLayout>
+          }
+        />
+
+        {/* Dashboard Routes — dùng DashboardLayout riêng (có Sidebar) */}
+        <Route
+          path="/dashboard"
+          element={
+            <DashboardLayout>
+              <DashboardOverviewPage />
+            </DashboardLayout>
+          }
+        />
+        <Route
+          path="/dashboard/projects"
+          element={
+            <DashboardLayout>
+              <MyProjectsPage />
+            </DashboardLayout>
+          }
+        />
+        <Route
+          path="/dashboard/projects/:id"
+          element={
+            <DashboardLayout>
+              <ProjectDetailPage />
+            </DashboardLayout>
           }
         />
       </Route>
