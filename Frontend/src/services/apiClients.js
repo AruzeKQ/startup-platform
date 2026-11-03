@@ -2,9 +2,10 @@ const BASE_URL = 'http://localhost:3000/api'
 
 async function fetchClient(endpoint, { method = 'GET', data, ...customConfig } = {}) {
     // khai báo header
+    const isFormData = data instanceof FormData;
     const token = typeof localStorage !== 'undefined' ? localStorage.getItem('token') : null;
     const headers = {
-        'Content-Type': 'application/json',
+        ...(!isFormData ? { 'Content-Type': 'application/json' } : {}),
         ...(token ? { 'x-auth-token': token } : {}),
     }
 

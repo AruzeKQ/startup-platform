@@ -53,9 +53,21 @@ export default function Header() {
               <>
                 <p className='text-sm font-semibold'>Hello con vợ, <strong>{user.name}</strong></p>
                 {user.role === 'startup' &&
-                  <Link to="/post-project" className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-4 py-2 rounded-lg text-sm transition-colors shadow-sm">
-                    Đăng dự án (Startup)
-                  </Link>}
+                  <>
+                    <NavLink
+                      to="/dashboard"
+                      className={({ isActive }) =>
+                        isActive
+                          ? "text-indigo-600 font-medium text-sm"
+                          : "text-gray-500 font-medium hover:text-indigo-600 transition-colors text-sm"
+                      }
+                    >
+                      Dashboard
+                    </NavLink>
+                    <Link to="/post-project" className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-4 py-2 rounded-lg text-sm transition-colors shadow-sm">
+                      Đăng dự án
+                    </Link>
+                  </>}
                 <button
                   onClick={handleLogout}
                   className='text-sm text-gray-500 font-medium hover:text-red-600 transition-colors cursor-pointer'>

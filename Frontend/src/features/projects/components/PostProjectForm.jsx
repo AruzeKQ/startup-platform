@@ -1,18 +1,13 @@
 import React from 'react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { projectApi } from '../services/projectApi';
 
 export default function PostProjectForm() {
-    const [selectedTags, setSelectedTags] = useState([])
-    const [submitData, setSubmitData] = useState({
-        logoUrl: '',
-        projectName: '',
-        companyName: '',
-        location: '',
-        salary: '',
-        tags: [],
-        description: ''
-    })
+    const navigate = useNavigate();
+    const [selectedTags, setSelectedTags] = useState([]);
+    const [status, setStatus] = useState(false);
+    const [file, setFile] = useState(null);
 
     const handleSelectTag = (tag) => {
         setSelectedTags((prev) => {
@@ -23,23 +18,18 @@ export default function PostProjectForm() {
         })
     }
 
+    const handlePress = () => navigate('/');
+
+    const handleCancel = () => navigate(-1)
+
     const handleSubmitForm = async (e) => {
         e.preventDefault();
         try {
-            const response = await projectApi.postProject({
-                ...submitData,
-                tags: selectedTags
-            });
+            const formData = new FormData(e.target);
+            selectedTags.forEach(tag => formData.append('tags', JSON.stringify(tag)));
+            const response = await projectApi.postProject(formData);
             console.log("Đã đẩy data lên thành công!!!")
-            setSubmitData({
-                logoUrl: '',
-                projectName: '',
-                companyName: '',
-                location: '',
-                salary: '',
-                tags: [],
-                description: ''
-            })
+            setStatus(true);
         } catch (error) {
             console.error(`Đang bị lỗi rồi ${error}`)
         }
@@ -61,14 +51,13 @@ export default function PostProjectForm() {
                         Logo công ty
                     </label>
                     <input
-                        type="url"
-                        value={submitData.logoUrl}
-                        onChange={(e) => setSubmitData({ ...submitData, logoUrl: e.target.value })}
-                        placeholder="https://example.com/logo.png"
+                        type="file"
+                        accept='image/*'
+                        name='logoFile'
                         className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none text-sm transition-all"
                     />
                     <p className="text-xs text-gray-400 mt-1">
-                        Dùng đường dẫn ảnh (URL), kích thước nên nhỏ dưới 200KB.
+                        Upload logo Start-up tại đây.
                     </p>
                 </div>
 
@@ -80,8 +69,7 @@ export default function PostProjectForm() {
                     <input
                         type="text"
                         required
-                        value={submitData.projectName}
-                        onChange={(e) => setSubmitData({ ...submitData, projectName: e.target.value })}
+                        name='projectName'
                         placeholder="VD: Nền tảng quản lý chi tiêu cá nhân"
                         className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none text-sm transition-all"
                     />
@@ -95,8 +83,7 @@ export default function PostProjectForm() {
                     <input
                         type="text"
                         required
-                        value={submitData.companyName}
-                        onChange={(e) => setSubmitData({ ...submitData, companyName: e.target.value })}
+                        name='companyName'
                         placeholder="VD: TechMatch JSC"
                         className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none text-sm transition-all"
                     />
@@ -109,8 +96,7 @@ export default function PostProjectForm() {
                             Địa điểm
                         </label>
                         <select
-                            value={submitData.location}
-                            onChange={(e) => setSubmitData({ ...submitData, location: e.target.value })}
+                            name='location'
                             className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-700 bg-white outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
                             <option value="">Chọn địa điểm</option>
                             <option value="hanoi">Hà Nội</option>
@@ -126,8 +112,7 @@ export default function PostProjectForm() {
                         </label>
                         <input
                             type="text"
-                            value={submitData.salary}
-                            onChange={(e) => setSubmitData({ ...submitData, salary: e.target.value })}
+                            name='salary'
                             placeholder="VD: 10-15 triệu/tháng"
                             className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none text-sm transition-all"
                         />
@@ -179,8 +164,7 @@ export default function PostProjectForm() {
                     <textarea
                         rows={6}
                         required
-                        value={submitData.description}
-                        onChange={(e) => setSubmitData({ ...submitData, description: e.target.value })}
+                        name='description'
                         placeholder="Mô tả về dự án, yêu cầu kỹ năng, tiến độ, thưởng..."
                         className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none text-sm transition-all resize-y"
                     />
@@ -190,6 +174,7 @@ export default function PostProjectForm() {
                 <div className="flex gap-3 pt-2">
                     <button
                         type="button"
+                        onClick={handleCancel}
                         className="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors text-sm cursor-pointer"
                     >
                         Hủy
@@ -201,6 +186,23 @@ export default function PostProjectForm() {
                         Đăng dự án
                     </button>
                 </div>
+
+                {/* Thông báo skibidi */}
+
+                {status && (
+                    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                        <div className="bg-white rounded-xl p-6 max-w-sm w-full text-center">
+                            <p className="text-gray-900 font-semibold mb-4">Tạo dự án thành công!</p>
+                            <button
+                                type='button'
+                                onClick={handlePress}
+                                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded-lg"
+                            >
+                                OK
+                            </button>
+                        </div>
+                    </div>
+                )}
             </form>
         </div>
     );
