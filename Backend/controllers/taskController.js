@@ -1,6 +1,7 @@
 const { Task } = require('../models/task');
 const { Project } = require('../models/project');
 const { memberList } = require('../models/memberList');
+const { find } = require('lodash');
 
 const getMyTasks = async (req, res) => {
     try {
@@ -56,12 +57,22 @@ const createTask = async (req, res) => {
 
 const getTaskById = async (req, res) => {
     try {
-        const findTask = await Task.findById(req.params.taskId);
-        const existProject = await Project.findById(findTask.project);
+        const { taskId } = req.params;
+        const findTask = await Task.findById(taskId)
+            .populate('project', 'projectName')
+            .populate('asignee', 'name email')
+            .populate('createdBy', 'name email');
+
+        if (!findTask) {
+            return res.status(404).send({ message: 'Task not found' });
+        }
+
+        const existProject = findTask.project;
         if (!existProject) {
             return res.status(404).send({ message: 'Project not found' });
         }
-        const isOwner = await existProject.owner.toString() !== req.user._id.toString();
+
+        const isOwner = existProject.owner.toString() === req.user._id.toString();
         const isMember = await memberList.exists({
             project: existProject._id,
             user: req.user._id
@@ -69,15 +80,7 @@ const getTaskById = async (req, res) => {
         if (!isOwner && !isMember) {
             return res.status(403).send({ message: 'Access denied' });
         }
-        const { taskId } = req.params;
-        const task = await Task.findById(taskId)
-            .populate('project', 'projectName')
-            .populate('asignee', 'name email')
-            .populate('createdBy', 'name email');
-        if (!task) {
-            return res.status(404).send({ message: 'Task not found' });
-        }
-        res.status(200).send({ message: 'Task', task });
+        res.status(200).send({ message: 'Task', findTask });
     } catch (error) {
         res.status(500).send({ message: error.message });
     }
