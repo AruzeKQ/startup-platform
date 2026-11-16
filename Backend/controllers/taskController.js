@@ -56,6 +56,19 @@ const createTask = async (req, res) => {
 
 const getTaskById = async (req, res) => {
     try {
+        const findTask = await Task.findById(req.params.taskId);
+        const existProject = await Project.findById(findTask.project);
+        if (!existProject) {
+            return res.status(404).send({ message: 'Project not found' });
+        }
+        const isOwner = await existProject.owner.toString() !== req.user._id.toString();
+        const isMember = await memberList.exists({
+            project: existProject._id,
+            user: req.user._id
+        })
+        if (!isOwner && !isMember) {
+            return res.status(403).send({ message: 'Access denied' });
+        }
         const { taskId } = req.params;
         const task = await Task.findById(taskId)
             .populate('project', 'projectName')

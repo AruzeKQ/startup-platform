@@ -1,7 +1,6 @@
-const { required } = require('joi');
 const mongoose = require('mongoose');
 
-const documentSchema = mongoose.Schema({
+const documentSchema = new mongoose.Schema({
     project: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Project',
@@ -14,6 +13,8 @@ const documentSchema = mongoose.Schema({
     },
     name: {
         type: String,
+        trim: true,
+        maxlength: 255,
         required: true
     },
     url: {
@@ -27,9 +28,19 @@ const documentSchema = mongoose.Schema({
     fileSize: {
         type: Number,
         default: 0
-    }
+    },
+    publicId: {
+        type: String,
+        default: ""
+    },
+    resourceType: {
+        type: String,
+        enum: ['image', 'video', 'raw', 'auto'],
+        default: 'raw'
+    },
+}, { timestamps: true });
 
-});
+documentSchema.index({ project: 1, createdAt: -1 });
 
 const Document = mongoose.model('Document', documentSchema);
 

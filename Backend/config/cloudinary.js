@@ -38,8 +38,13 @@ const uploadToCloudinary = (fileBuffer, originalname, folderName = 'startup_docu
     });
 };
 
+const deleteFromCloudinary = (publicId, resourceType = 'raw') => {
+    return cloudinary.uploader.destroy(publicId, { resource_type: resourceType });
+};
+
 module.exports = {
     cloudinary,
     upload,
     uploadToCloudinary,
+    deleteFromCloudinary,
 };

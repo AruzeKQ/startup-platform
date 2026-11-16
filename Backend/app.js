@@ -8,7 +8,7 @@ const userRouter = require('./routes/userRoutes');
 const projectRouter = require('./routes/projectRoutes');
 const taskRouter = require('./routes/taskRoutes');
 const memberListRouter = require('./routes/memberListRoute');
-//const documentRouter = require('./routes/documentRoute');
+const documentRouter = require('./routes/documentRoute');
 const app = express();
 
 app.use(cors({
@@ -31,7 +31,7 @@ app.use('/api', memberListRouter);
 //chat router
 
 //documents router
-// app.use('/api', documentRouter);
+app.use('/api', documentRouter);
 //reviews router
 
 //connect to mongodb local 
