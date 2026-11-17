@@ -9,6 +9,7 @@ const projectRouter = require('./routes/projectRoutes');
 const taskRouter = require('./routes/taskRoutes');
 const memberListRouter = require('./routes/memberListRoute');
 const documentRouter = require('./routes/documentRoute');
+const multer = require('multer');
 const app = express();
 
 app.use(cors({
