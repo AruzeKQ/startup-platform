@@ -21,7 +21,7 @@ export default function LoginForm() {
       setToken(response.token);
       // lưu data user
       localStorage.setItem('user', JSON.stringify(response.user))
-      setUser()
+      setUser(response.user);
       // chuyển hướng về trang chính thức
       window.location.href = '/';
     } catch (error) {

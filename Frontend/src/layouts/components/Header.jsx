@@ -6,6 +6,7 @@ import { userContext } from '../../contexts/authContext';
 export default function Header() {
   const { user, token, setUser, setToken } = useContext(userContext);
   console.log(user);
+  console.log(token);
   const handleLogout = () => {
     localStorage.clear();
     setUser(null);

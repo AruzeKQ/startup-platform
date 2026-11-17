@@ -20,7 +20,7 @@ async function fetchClient(endpoint, { method = 'GET', data, ...customConfig } =
 
     // nếu có data gửi đi -> chuyển thành chuỗi JSON
     if (data) {
-        config.body = JSON.stringify(data)
+        config.body = isFormData ? data : JSON.stringify(data)
     }
 
     try {
