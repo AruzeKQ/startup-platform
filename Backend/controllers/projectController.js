@@ -1,4 +1,5 @@
 const { Project, projectValidate } = require('../models/project');
+const { uploadToCloudinary } = require('../config/cloudinary');
 
 const getAllProjects = async (req, res) => {
     try {
@@ -32,6 +33,17 @@ const getMyProjects = async (req, res) => {
 
 const createProject = async (req, res) => {
     try {
+        let logoUrl = req.body.logoUrl;
+
+        if (req.file) {
+            const uploaded = await uploadToCloudinary(
+                req.file.buffer,
+                req.file.originalname,
+                'project_logos'
+            );
+            logoUrl = uploaded.secure_url;
+        }
+
         if (typeof req.body.tags === 'string') {
             try {
                 req.body.tags = JSON.parse(req.body.tags);
