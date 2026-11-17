@@ -59,7 +59,7 @@ const createProject = async (req, res) => {
         const project = new Project({
             projectName: req.body.projectName,
             companyName: req.body.companyName,
-            logoUrl: req.body.logoUrl,
+            logoUrl: logoUrl,
             location: req.body.location,
             salary: req.body.salary,
             tags: req.body.tags,
