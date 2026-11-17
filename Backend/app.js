@@ -9,6 +9,7 @@ const projectRouter = require('./routes/projectRoutes');
 const taskRouter = require('./routes/taskRoutes');
 const memberListRouter = require('./routes/memberListRoute');
 const documentRouter = require('./routes/documentRoute');
+const reviewRouter = require('./routes/reviewRoutes');
 const multer = require('multer');
 const app = express();
 
@@ -34,7 +35,7 @@ app.use('/api', memberListRouter);
 //documents router
 app.use('/api', documentRouter);
 //reviews router
-
+app.use('/api/reviews', reviewRouter);
 //connect to mongodb local 
 mongoose.connect(process.env.DB_URL)
     .then(() => console.log('connected to mongodb'))
